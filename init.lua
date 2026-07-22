@@ -684,13 +684,15 @@ vim.on_key(function(key)
     waiting_for_char = false
     return
   end
-  local current_state = vim.fn.state()
-  print(current_state)
+  -- local current_state = vim.fn.state()
   if vim.api.nvim_get_mode().mode == "n" then
     if (key == "r" or key == "t" or key == "T" or key == "f" or key == "F") then
-      if string.find(current_state, "S") then
-        return
-      end
+      -- I swear the below was working for all, but now it's not for anything but r.
+      -- I think I added it for things like <leader>fm, but now that's working without this...
+      -- Whatever. Keep an eye on it.
+      -- if string.find(current_state, "S") then
+      --   return
+      -- end
       waiting_for_char = true
       vim.rpcnotify(0, "mode_change", "i")
     end
