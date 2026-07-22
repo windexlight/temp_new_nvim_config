@@ -623,7 +623,7 @@ local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
 
 -- Repeat movement with ; and ,
 -- ensure ; goes forward and , goes backward regardless of the last direction
-vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next)
+vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- These don't seem to actually work if there is an f or t in history
 vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
 
 -- vim way: ; goes to the direction you were moving.
@@ -685,7 +685,7 @@ vim.on_key(function(key)
     return
   end
   -- local current_state = vim.fn.state()
-  if vim.api.nvim_get_mode().mode == "n" then
+  if vim.api.nvim_get_mode().mode == "n" or vim.api.nvim_get_mode().mode == "v" then
     if (key == "r" or key == "t" or key == "T" or key == "f" or key == "F") then
       -- I swear the below was working for all, but now it's not for anything but r.
       -- I think I added it for things like <leader>fm, but now that's working without this...
