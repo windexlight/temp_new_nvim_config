@@ -577,64 +577,28 @@ require("nvim-treesitter-textobjects").setup {
 }
 
 -- nvim-treesitter-textobjects keymaps
-map({ "x", "o" }, "am", function()
-  require "nvim-treesitter-textobjects.select".select_textobject("@function.outer", "textobjects")
-end)
-map({ "x", "o" }, "im", function()
-  require "nvim-treesitter-textobjects.select".select_textobject("@function.inner", "textobjects")
-end)
-map({ "x", "o" }, "ac", function()
-  require "nvim-treesitter-textobjects.select".select_textobject("@class.outer", "textobjects")
-end)
-map({ "x", "o" }, "ic", function()
-  require "nvim-treesitter-textobjects.select".select_textobject("@class.inner", "textobjects")
-end)
-map({ "x", "o" }, "as", function()
-  require "nvim-treesitter-textobjects.select".select_textobject("@local.scope", "locals")
-end)
-map("n", "<leader>a", function()
-  require("nvim-treesitter-textobjects.swap").swap_next "@parameter.inner"
-end)
-map("n", "<leader>A", function()
-  require("nvim-treesitter-textobjects.swap").swap_previous "@parameter.outer"
-end)
+map({ "x", "o" }, "am", function() require "nvim-treesitter-textobjects.select".select_textobject("@function.outer", "textobjects") end)
+map({ "x", "o" }, "im", function() require "nvim-treesitter-textobjects.select".select_textobject("@function.inner", "textobjects") end)
+map({ "x", "o" }, "ac", function() require "nvim-treesitter-textobjects.select".select_textobject("@class.outer", "textobjects") end)
+map({ "x", "o" }, "ic", function() require "nvim-treesitter-textobjects.select".select_textobject("@class.inner", "textobjects") end)
+map({ "x", "o" }, "as", function() require "nvim-treesitter-textobjects.select".select_textobject("@local.scope", "locals") end)
+map("n", "<leader>a", function() require("nvim-treesitter-textobjects.swap").swap_next "@parameter.inner" end)
+map("n", "<leader>A", function() require("nvim-treesitter-textobjects.swap").swap_previous "@parameter.outer" end)
 
-map({ "n", "x", "o" }, "]m", function()
-  require("nvim-treesitter-textobjects.move").goto_next_start("@function.outer", "textobjects")
-end)
-map({ "n", "x", "o" }, "]]", function()
-  require("nvim-treesitter-textobjects.move").goto_next_start("@class.outer", "textobjects")
-end)
-map({ "n", "x", "o" }, "]o", function()
-  require("nvim-treesitter-textobjects.move").goto_next_start({"@loop.inner", "@loop.outer"}, "textobjects")
-end)
-map({ "n", "x", "o" }, "]s", function()
-  require("nvim-treesitter-textobjects.move").goto_next_start("@local.scope", "locals")
-end)
-map({ "n", "x", "o" }, "]z", function()
-  require("nvim-treesitter-textobjects.move").goto_next_start("@fold", "folds")
-end)
+map({ "n", "x", "o" }, "]m", function() require("nvim-treesitter-textobjects.move").goto_next_start("@function.outer", "textobjects") end)
+map({ "n", "x", "o" }, "]]", function() require("nvim-treesitter-textobjects.move").goto_next_start("@class.outer", "textobjects") end)
+map({ "n", "x", "o" }, "]o", function() require("nvim-treesitter-textobjects.move").goto_next_start({"@loop.inner", "@loop.outer"}, "textobjects") end)
+map({ "n", "x", "o" }, "]s", function() require("nvim-treesitter-textobjects.move").goto_next_start("@local.scope", "locals") end)
+map({ "n", "x", "o" }, "]z", function() require("nvim-treesitter-textobjects.move").goto_next_start("@fold", "folds") end)
 
-map({ "n", "x", "o" }, "]M", function()
-  require("nvim-treesitter-textobjects.move").goto_next_end("@function.outer", "textobjects")
-end)
-map({ "n", "x", "o" }, "][", function()
-  require("nvim-treesitter-textobjects.move").goto_next_end("@class.outer", "textobjects")
-end)
+map({ "n", "x", "o" }, "]M", function() require("nvim-treesitter-textobjects.move").goto_next_end("@function.outer", "textobjects") end)
+map({ "n", "x", "o" }, "][", function() require("nvim-treesitter-textobjects.move").goto_next_end("@class.outer", "textobjects") end)
 
-map({ "n", "x", "o" }, "[m", function()
-  require("nvim-treesitter-textobjects.move").goto_previous_start("@function.outer", "textobjects")
-end)
-map({ "n", "x", "o" }, "[[", function()
-  require("nvim-treesitter-textobjects.move").goto_previous_start("@class.outer", "textobjects")
-end)
+map({ "n", "x", "o" }, "[m", function() require("nvim-treesitter-textobjects.move").goto_previous_start("@function.outer", "textobjects") end)
+map({ "n", "x", "o" }, "[[", function() require("nvim-treesitter-textobjects.move").goto_previous_start("@class.outer", "textobjects") end)
 
-map({ "n", "x", "o" }, "[M", function()
-  require("nvim-treesitter-textobjects.move").goto_previous_end("@function.outer", "textobjects")
-end)
-map({ "n", "x", "o" }, "[]", function()
-  require("nvim-treesitter-textobjects.move").goto_previous_end("@class.outer", "textobjects")
-end)
+map({ "n", "x", "o" }, "[M", function() require("nvim-treesitter-textobjects.move").goto_previous_end("@function.outer", "textobjects") end)
+map({ "n", "x", "o" }, "[]", function() require("nvim-treesitter-textobjects.move").goto_previous_end("@class.outer", "textobjects") end)
 
 -- Go to either the start or the end, whichever is closer.
 -- Use if you want more granular movements
@@ -645,23 +609,6 @@ end)
 --   require("nvim-treesitter-textobjects.move").goto_previous("@conditional.outer", "textobjects")
 -- end)
 --
-
-local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
-
--- Repeat movement with ; and ,
--- ensure ; goes forward and , goes backward regardless of the last direction
-map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- TODO -- These don't seem to actually work if there is an f or t in history
-map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
-
--- vim way: ; goes to the direction you were moving.
--- map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
--- map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
-
--- Make builtin f, F, t, T also repeatable with ; and ,
-map({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
-map({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
-map({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
-map({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
 
 require('fzf-lua').setup {
   fzf_colors = true,
@@ -711,21 +658,45 @@ vim.on_key(function(key)
     waiting_for_char = false
     return
   end
-  -- local current_state = vim.fn.state()
-  if vim.api.nvim_get_mode().mode == "n" or vim.api.nvim_get_mode().mode == "v" then
-    if (key == "r" or key == "t" or key == "T" or key == "f" or key == "F") then
-      -- I swear the below was working for all, but now it's not for anything but r.
-      -- I think I added it for things like <leader>fm, but now that's working without this...
-      -- Whatever. Keep an eye on it.
-      -- Okay, now I find a case needing attention again... when using something like ct or df, etc., it doesn't trigger this...
-      -- if string.find(current_state, "S") then
-      --   return
-      -- end
-      waiting_for_char = true
-      vim.rpcnotify(0, "mode_change", "i")
-    end
-  end
+  -- -- local current_state = vim.fn.state()
+  -- if vim.api.nvim_get_mode().mode == "n" or vim.api.nvim_get_mode().mode == "v" then
+  --   if (key == "r" or key == "t" or key == "T" or key == "f" or key == "F") then
+  --     -- I swear the below was working for all, but now it's not for anything but r.
+  --     -- I think I added it for things like <leader>fm, but now that's working without this...
+  --     -- Whatever. Keep an eye on it.
+  --     -- Okay, now I find a case needing attention again... when using something like ct or df, etc., it doesn't trigger this...
+  --     -- if string.find(current_state, "S") then
+  --     --   return
+  --     -- end
+  --     waiting_for_char = true
+  --     vim.rpcnotify(0, "mode_change", "i")
+  --   end
+  -- end
 end, ns)
+
+local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
+
+-- Repeat movement with ; and ,
+-- ensure ; goes forward and , goes backward regardless of the last direction
+map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- TODO -- These don't seem to actually work if there is an f or t in history
+map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
+
+-- vim way: ; goes to the direction you were moving.
+-- map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
+-- map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+
+local function f_wrapper(call_me)
+  waiting_for_char = true
+  vim.rpcnotify(0, "mode_change", "i")
+  return call_me()
+end
+
+-- vim.api.nvim_get_mode().mode returns "r?" -- true???
+-- Make builtin f, F, t, T also repeatable with ; and ,
+map({ "n", "x", "o" }, "f", function() return f_wrapper(ts_repeat_move.builtin_f_expr) end, { expr = true })
+map({ "n", "x", "o" }, "F", function() return f_wrapper(ts_repeat_move.builtin_F_expr) end, { expr = true })
+map({ "n", "x", "o" }, "t", function() return f_wrapper(ts_repeat_move.builtin_t_expr) end, { expr = true })
+map({ "n", "x", "o" }, "T", function() return f_wrapper(ts_repeat_move.builtin_T_expr) end, { expr = true })
 
 -- Fuzzy cd
 map({"i","n","v"}, "<M-f>d", function()
