@@ -327,15 +327,42 @@ map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 -- map("n", "zj", "zcjzOzz", { desc = "Close current fold when open. Always open next fold." })
 -- map("n", "zk", "zckzOzz", { desc = "Close current fold when open. Always open previous fold." })
 
+-- require("fzf-lua").lsp_definitions()
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
 map("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Code Rename" })
 -- map("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover Documentation", has = "hoverProvider" })
 -- map("n", "K", vim.lsp.buf.hover, { desc = "Hover (alt)", has = "hoverProvider" })
 -- map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition", has = "definitionProvider" }) -- TODO -- these error
 
-map("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover Documentation" })
+-- TODO: keep fleshing out lsp commands
+-- map("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover Documentation" })
+-- map("n", "<leader>gth", vim.lsp.buf.typehierarchy, { desc = "Show Type Heirarchy" })
 map("n", "K", vim.lsp.buf.hover, { desc = "Hover (alt)" })
-map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
+map("n", "gd", function() FzfLua.lsp_definitions() end, { desc = "Goto Definition" }) -- Native "go to definition of word under the cursor in current function"
+map("n", "gr", function() FzfLua.lsp_references() end, { desc = "Goto References" }) -- Native "virtual replace N chars with {char}"
+map("n", "gds", function() FzfLua.lsp_document_symbols() end, { desc = "Goto Document Symbols" }) -- No native
+map("n", "gws", function() FzfLua.lsp_workspace_symbols() end, { desc = "Goto Workspace Symbols" }) -- No native
+
+-- Others:
+--Command	List
+-- lsp_declarations	Declarations
+-- lsp_typedefs	Type Definitions
+-- lsp_implementations	Implementations
+-- lsp_live_workspace_symbols	Workspace Symbols (live query)
+-- lsp_incoming_calls	Incoming Calls
+-- lsp_outgoing_calls	Outgoing Calls
+-- lsp_type_sub	Sub Types
+-- lsp_type_super	Super Types
+-- lsp_code_actions	Code Actions
+-- lsp_finder	All LSP locations, combined view
+-- diagnostics_document	Document Diagnostics
+-- diagnostics_workspace	Workspace Diagnostics
+-- lsp_document_diagnostics	alias to diagnostics_document
+-- lsp_workspace_diagnostics	alias to diagnostics_workspace
+
+-- TODO: add other fzf-lua keymaps
+
+-- vim.lsp.codelens.enable(true) -- Probably don't want this, it adds extra fake lines everywhere
 
 -- AUTOCOMMANDS (EVENT HANDLERS)
 
@@ -422,7 +449,7 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function(event)
     vim.bo[event.buf].buflisted = false
     vim.schedule(function()
-      vim.keymap.set("n", "q", function()
+      map("n", "q", function()
         vim.cmd("close")
         pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
       end, {
@@ -452,7 +479,7 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "MiniFilesBufferCreate",
   callback = function(args)
     local buf_id = args.data.buf_id
-    vim.keymap.set("n", ".", function()
+    map("n", ".", function()
       local state = require("mini.files").get_explorer_state()
       if not state or not state.branch or not state.depth_focus then return end
       local path = state.branch[state.depth_focus]
@@ -550,71 +577,71 @@ require("nvim-treesitter-textobjects").setup {
 }
 
 -- nvim-treesitter-textobjects keymaps
-vim.keymap.set({ "x", "o" }, "am", function()
+map({ "x", "o" }, "am", function()
   require "nvim-treesitter-textobjects.select".select_textobject("@function.outer", "textobjects")
 end)
-vim.keymap.set({ "x", "o" }, "im", function()
+map({ "x", "o" }, "im", function()
   require "nvim-treesitter-textobjects.select".select_textobject("@function.inner", "textobjects")
 end)
-vim.keymap.set({ "x", "o" }, "ac", function()
+map({ "x", "o" }, "ac", function()
   require "nvim-treesitter-textobjects.select".select_textobject("@class.outer", "textobjects")
 end)
-vim.keymap.set({ "x", "o" }, "ic", function()
+map({ "x", "o" }, "ic", function()
   require "nvim-treesitter-textobjects.select".select_textobject("@class.inner", "textobjects")
 end)
-vim.keymap.set({ "x", "o" }, "as", function()
+map({ "x", "o" }, "as", function()
   require "nvim-treesitter-textobjects.select".select_textobject("@local.scope", "locals")
 end)
-vim.keymap.set("n", "<leader>a", function()
+map("n", "<leader>a", function()
   require("nvim-treesitter-textobjects.swap").swap_next "@parameter.inner"
 end)
-vim.keymap.set("n", "<leader>A", function()
+map("n", "<leader>A", function()
   require("nvim-treesitter-textobjects.swap").swap_previous "@parameter.outer"
 end)
 
-vim.keymap.set({ "n", "x", "o" }, "]m", function()
+map({ "n", "x", "o" }, "]m", function()
   require("nvim-treesitter-textobjects.move").goto_next_start("@function.outer", "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "]]", function()
+map({ "n", "x", "o" }, "]]", function()
   require("nvim-treesitter-textobjects.move").goto_next_start("@class.outer", "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "]o", function()
+map({ "n", "x", "o" }, "]o", function()
   require("nvim-treesitter-textobjects.move").goto_next_start({"@loop.inner", "@loop.outer"}, "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "]s", function()
+map({ "n", "x", "o" }, "]s", function()
   require("nvim-treesitter-textobjects.move").goto_next_start("@local.scope", "locals")
 end)
-vim.keymap.set({ "n", "x", "o" }, "]z", function()
+map({ "n", "x", "o" }, "]z", function()
   require("nvim-treesitter-textobjects.move").goto_next_start("@fold", "folds")
 end)
 
-vim.keymap.set({ "n", "x", "o" }, "]M", function()
+map({ "n", "x", "o" }, "]M", function()
   require("nvim-treesitter-textobjects.move").goto_next_end("@function.outer", "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "][", function()
+map({ "n", "x", "o" }, "][", function()
   require("nvim-treesitter-textobjects.move").goto_next_end("@class.outer", "textobjects")
 end)
 
-vim.keymap.set({ "n", "x", "o" }, "[m", function()
+map({ "n", "x", "o" }, "[m", function()
   require("nvim-treesitter-textobjects.move").goto_previous_start("@function.outer", "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "[[", function()
+map({ "n", "x", "o" }, "[[", function()
   require("nvim-treesitter-textobjects.move").goto_previous_start("@class.outer", "textobjects")
 end)
 
-vim.keymap.set({ "n", "x", "o" }, "[M", function()
+map({ "n", "x", "o" }, "[M", function()
   require("nvim-treesitter-textobjects.move").goto_previous_end("@function.outer", "textobjects")
 end)
-vim.keymap.set({ "n", "x", "o" }, "[]", function()
+map({ "n", "x", "o" }, "[]", function()
   require("nvim-treesitter-textobjects.move").goto_previous_end("@class.outer", "textobjects")
 end)
 
 -- Go to either the start or the end, whichever is closer.
 -- Use if you want more granular movements
--- vim.keymap.set({ "n", "x", "o" }, "]d", function()
+-- map({ "n", "x", "o" }, "]d", function()
 --   require("nvim-treesitter-textobjects.move").goto_next("@conditional.outer", "textobjects")
 -- end)
--- vim.keymap.set({ "n", "x", "o" }, "[d", function()
+-- map({ "n", "x", "o" }, "[d", function()
 --   require("nvim-treesitter-textobjects.move").goto_previous("@conditional.outer", "textobjects")
 -- end)
 --
@@ -623,18 +650,18 @@ local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
 
 -- Repeat movement with ; and ,
 -- ensure ; goes forward and , goes backward regardless of the last direction
-vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- These don't seem to actually work if there is an f or t in history
-vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
+map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- TODO -- These don't seem to actually work if there is an f or t in history
+map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
 
 -- vim way: ; goes to the direction you were moving.
--- vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
--- vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+-- map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
+-- map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 
 -- Make builtin f, F, t, T also repeatable with ; and ,
-vim.keymap.set({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
-vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
-vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
-vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
+map({ "n", "x", "o" }, "f", ts_repeat_move.builtin_f_expr, { expr = true })
+map({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F_expr, { expr = true })
+map({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t_expr, { expr = true })
+map({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T_expr, { expr = true })
 
 require('fzf-lua').setup {
   fzf_colors = true,
@@ -690,6 +717,7 @@ vim.on_key(function(key)
       -- I swear the below was working for all, but now it's not for anything but r.
       -- I think I added it for things like <leader>fm, but now that's working without this...
       -- Whatever. Keep an eye on it.
+      -- Okay, now I find a case needing attention again... when using something like ct or df, etc., it doesn't trigger this...
       -- if string.find(current_state, "S") then
       --   return
       -- end
