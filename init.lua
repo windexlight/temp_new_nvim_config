@@ -652,26 +652,16 @@ vim.api.nvim_create_autocmd("TermLeave", {
 -- Notify via RPC when using r, f, F, t, T and waiting for next char (treat it like insert mode)
 local ns = vim.api.nvim_create_namespace("rpc_char_tracker")
 local waiting_for_char = false
+local f_wrapper_armed = false
 vim.on_key(function(key)
-  if waiting_for_char then
+  if f_wrapper_armed then
+    vim.rpcnotify(0, "mode_change", "i")
+    waiting_for_char = true
+    f_wrapper_armed = false
+  elseif waiting_for_char then
     vim.rpcnotify(0, "mode_change", "n")
     waiting_for_char = false
-    return
   end
-  -- -- local current_state = vim.fn.state()
-  -- if vim.api.nvim_get_mode().mode == "n" or vim.api.nvim_get_mode().mode == "v" then
-  --   if (key == "r" or key == "t" or key == "T" or key == "f" or key == "F") then
-  --     -- I swear the below was working for all, but now it's not for anything but r.
-  --     -- I think I added it for things like <leader>fm, but now that's working without this...
-  --     -- Whatever. Keep an eye on it.
-  --     -- Okay, now I find a case needing attention again... when using something like ct or df, etc., it doesn't trigger this...
-  --     -- if string.find(current_state, "S") then
-  --     --   return
-  --     -- end
-  --     waiting_for_char = true
-  --     vim.rpcnotify(0, "mode_change", "i")
-  --   end
-  -- end
 end, ns)
 
 local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
@@ -686,17 +676,21 @@ map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
 -- map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 
 local function f_wrapper(call_me)
-  waiting_for_char = true
-  vim.rpcnotify(0, "mode_change", "i")
+  f_wrapper_armed = true
   return call_me()
 end
 
--- vim.api.nvim_get_mode().mode returns "r?" -- true???
+local function r_wrapper()
+  f_wrapper_armed = true
+  return "r"
+end
+
 -- Make builtin f, F, t, T also repeatable with ; and ,
 map({ "n", "x", "o" }, "f", function() return f_wrapper(ts_repeat_move.builtin_f_expr) end, { expr = true })
 map({ "n", "x", "o" }, "F", function() return f_wrapper(ts_repeat_move.builtin_F_expr) end, { expr = true })
 map({ "n", "x", "o" }, "t", function() return f_wrapper(ts_repeat_move.builtin_t_expr) end, { expr = true })
 map({ "n", "x", "o" }, "T", function() return f_wrapper(ts_repeat_move.builtin_T_expr) end, { expr = true })
+map({ "n", "x", "o" }, "r", r_wrapper, { expr = true })
 
 -- Fuzzy cd
 map({"i","n","v"}, "<M-f>d", function()
