@@ -348,6 +348,7 @@ map("n", "gd", function() FzfLua.lsp_definitions() end, { desc = "Goto Definitio
 map("n", "gr", function() FzfLua.lsp_references() end, { desc = "Goto References" }) -- Native "virtual replace N chars with {char}"
 map("n", "gds", function() FzfLua.lsp_document_symbols() end, { desc = "Goto Document Symbols" }) -- No native
 map("n", "gws", function() FzfLua.lsp_workspace_symbols() end, { desc = "Goto Workspace Symbols" }) -- No native
+map("n", "<leader>fo", function() FzfLua.oldfiles() end, { desc = "Goto Oldfiles" }) -- No native
 
 -- Others:
 --Command	List
