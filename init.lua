@@ -127,6 +127,12 @@ opt.spelllang = { "en" }
 -- opt.statuscolumn = [[%!v:lua.LazyVim.statuscolumn()]]
 -- opt.timeoutlen = vim.g.vscode and 1000 or 300 -- Lower than default (1000) to quickly trigger which-key
 
+-- Put cwd on statusline
+function _G.get_cwd()
+  local cwd = vim.fn.getcwd()
+  return vim.fn.fnamemodify(cwd, ":~")
+end
+vim.opt.statusline = "%F %m %= [%{%v:lua.get_cwd()%}] %l:%c"
 
 -- KEYMAPS
 
@@ -363,6 +369,27 @@ map("n", "gws", function() FzfLua.lsp_workspace_symbols() end, { desc = "Goto Wo
 -- TODO: add other fzf-lua keymaps
 
 -- vim.lsp.codelens.enable(true) -- Probably don't want this, it adds extra fake lines everywhere
+
+-- CD to LSP root
+vim.api.nvim_create_user_command('CdLspRoot', function()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  if #clients > 0 then
+    local root = clients[1].config.root_dir
+    if root then
+      vim.cmd.cd(root)
+      print("Changed cwd to: " .. root)
+      return
+    end
+  end
+  vim.cmd("cd " .. vim.fn.expand("%:p:h"))
+end, {})
+vim.keymap.set('n', '<leader>cd', ':CdLspRoot<CR>', { desc = 'CD to LSP root' })
+
+-- Open Alacritty to current cwd
+vim.keymap.set('n', '<leader>cm', ':call jobstart(\'cmd /c start "" "alacritty"\', {\'detach\': 1})<CR>', { desc = 'Open Alacritty' })
+
+-- Open Explorer to current cwd
+vim.keymap.set('n', '<leader>ii', ':call jobstart(\'cmd /c start .\')<CR>', { desc = 'Open Explorer' })
 
 -- AUTOCOMMANDS (EVENT HANDLERS)
 
