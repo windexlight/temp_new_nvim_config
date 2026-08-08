@@ -349,6 +349,9 @@ map("n", "gr", function() FzfLua.lsp_references() end, { desc = "Goto References
 map("n", "gds", function() FzfLua.lsp_document_symbols() end, { desc = "Goto Document Symbols" }) -- No native
 map("n", "gws", function() FzfLua.lsp_workspace_symbols() end, { desc = "Goto Workspace Symbols" }) -- No native
 map("n", "<leader>fo", function() FzfLua.oldfiles() end, { desc = "Goto Oldfiles" }) -- No native
+map("n", "<leader>fb", function() FzfLua.buffers() end, { desc = "Goto Buffers" }) -- No native
+map("n", "<leader>ff", function() FzfLua.files() end, { desc = "Goto Files" }) -- No native
+map("n", "<leader>ft", function() FzfLua.tabs() end, { desc = "Goto Tabs" }) -- No native
 
 -- Others:
 --Command	List
