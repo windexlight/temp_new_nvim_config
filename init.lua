@@ -352,6 +352,7 @@ map("n", "<leader>fo", function() FzfLua.oldfiles() end, { desc = "Goto Oldfiles
 map("n", "<leader>fb", function() FzfLua.buffers() end, { desc = "Goto Buffers" }) -- No native
 map("n", "<leader>ff", function() FzfLua.files() end, { desc = "Goto Files" }) -- No native
 map("n", "<leader>ft", function() FzfLua.tabs() end, { desc = "Goto Tabs" }) -- No native
+map("n", "<leader>fl", function() FzfLua.lines() end, { desc = "Goto Lines" }) -- No native
 
 -- Others:
 --Command	List
