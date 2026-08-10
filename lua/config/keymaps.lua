@@ -123,7 +123,7 @@ local diagnostic_goto = function(next, severity)
     })
   end
 end
-map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
+map("n", "<leader>ld", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
 map("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
 map("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
@@ -183,19 +183,23 @@ map("n", "gm", function() FzfLua.marks() end, { desc = "Goto Marks" }) -- No nat
 
 
 -- CD to LSP root
-vim.api.nvim_create_user_command('CdLspRoot', function()
+local function cd_to_lsp_root(loc)
   local clients = vim.lsp.get_clients({ bufnr = 0 })
+  local dir = vim.fn.expand("%:p:h")
   if #clients > 0 then
     local root = clients[1].config.root_dir
     if root then
-      vim.cmd.cd(root)
-      print("Changed cwd to: " .. root)
-      return
+      dir = root
     end
   end
-  vim.cmd("cd " .. vim.fn.expand("%:p:h"))
-end, {})
+  local cmd = (loc and "lcd") or "cd"
+  vim.cmd(cmd .. " " .. dir)
+  print(cmd .. ": " .. dir)
+end
+vim.api.nvim_create_user_command('CdLspRoot', function() cd_to_lsp_root() end, {})
+vim.api.nvim_create_user_command('LcdLspRoot', function() cd_to_lsp_root(true) end, {})
 map('n', '<leader>cd', ':CdLspRoot<CR>', { desc = 'CD to LSP root' })
+map('n', '<leader>lcd', ':LcdLspRoot<CR>', { desc = 'LCD to LSP root' })
 
 -- Open Alacritty to current cwd
 map('n', '<leader>cm', ':call jobstart(\'cmd /c start "" "alacritty"\', {\'detach\': 1})<CR>', { desc = 'Open Alacritty' })
