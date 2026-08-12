@@ -39,6 +39,23 @@ require('fzf-lua').setup {
   fzf_colors = true,
   -- files = { file_icons = false, git_icons = false },
   -- oldfiles = { file_icons = false, git_icons = false },
+  winopts = {
+    split = "belowright new",
+    preview = {
+      layout = "flex",
+      vertical = "down:50%",
+      horizontal = "right:50%",
+    },
+  },
+  grep = {
+    rg_glob_fn = function(query, opts)
+      local search, flags = query:match("^(.-)%s+%-%-%s+(.*)$")
+      if not search then
+        return query, nil
+      end
+      return search, flags
+    end,
+  },
 }
 require('mini.completion').setup {}
 require('quicker').setup {}
