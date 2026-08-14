@@ -3,6 +3,7 @@
 -- See `:h mapleader`
 -- NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
+vim.g.maplocalleader = '\\'
 
 -- Enable UI2
 require('vim._core.ui2').enable()
@@ -33,6 +34,8 @@ vim.pack.add({
   -- Treesitter
   'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  -- Grug-Far
+  'https://github.com/MagicDuck/grug-far.nvim',
 })
 
 require('fzf-lua').setup {
@@ -61,6 +64,7 @@ require('mini.completion').setup {}
 require('quicker').setup {}
 require('gitsigns').setup {}
 require('mini.files').setup {}
+require('grug-far').setup {}
 
 require('config.options')
 require('config.diagnostics')
