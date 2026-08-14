@@ -1,23 +1,59 @@
 local map = vim.keymap.set
 
+local last_notified_mode = nil
+local pending = false
+
 -- RPC stuff for QMK
 vim.fn.serverstart([[\\.\pipe\nvim-win-]] .. vim.fn.getpid())
 
 -- Notify via RPC when mode changes
-local function notify_mode_change()
-  local current_mode = vim.api.nvim_get_mode().mode
-  vim.rpcnotify(0, "mode_change", current_mode)
+local function commit_mode()
+  pending = false
+  local mode = vim.api.nvim_get_mode().mode
+  if mode ~= last_notified_mode then
+    last_notified_mode = mode
+    vim.rpcnotify(0, "mode_change", mode)
+  end
 end
+
 vim.api.nvim_create_autocmd("ModeChanged", {
   pattern = "*",
-  callback = notify_mode_change,
+  callback = function()
+    local mode = vim.api.nvim_get_mode().mode
+    pending = true
+    if mode == 't' then -- Watch for other corner cases where SafeState isn't triggered
+      commit_mode()
+    end
+  end,
 })
+
+-- Keep this in mind if for some reason some future plugin causes SafeState to never fire
+-- vim.api.nvim_create_autocmd("ModeChanged", {
+--   pattern = "*",
+--   callback = function()
+--     pending = true
+--     vim.defer_fn(function()
+--       if pending then commit_mode() end
+--     end, 15) -- effectively never fires in normal grug-far usage; just a backstop
+--   end,
+-- })
+
+-- This works around an issue with spurious mode changes in some cases (grug-far insert mode, as one example)
+vim.api.nvim_create_autocmd("SafeState", {
+  callback = function()
+    if pending then
+      commit_mode()
+    end
+  end,
+})
+
 -- This is to work around an issue with ModeChanged not always firing when closing a window such as fzf-lua. Keep an eye out for other issues.
 vim.api.nvim_create_autocmd("TermLeave", {
   pattern = "*",
   callback = function()
     vim.schedule(function()
-      notify_mode_change()
+      pending = true
+      commit_mode()
     end)
   end,
 })
