@@ -316,3 +316,6 @@ end, { desc = 'grug-far: Search within range' })
 --   end,
 -- })
 
+-- Open Neogit
+vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Open Neogit UI" })
+

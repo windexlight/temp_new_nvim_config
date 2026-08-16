@@ -36,6 +36,10 @@ vim.pack.add({
   'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
   -- Grug-Far
   'https://github.com/MagicDuck/grug-far.nvim',
+  -- Diff view
+  'https://github.com/sindrets/diffview.nvim',
+  -- Neogit
+  'https://github.com/neogitorg/neogit',
 })
 
 require('fzf-lua').setup {
@@ -70,6 +74,10 @@ require('mini.files').setup {
   }
 }
 require('grug-far').setup {}
+require('neogit').setup {
+  disable_line_numbers = false,
+  disable_relative_line_numbers = false,
+}
 
 require('config.options')
 require('config.diagnostics')
