@@ -262,11 +262,34 @@ map({"i","n","v"}, "<M-f>d", function()
 })
 end, {silent=true, desc="Fuzzy cd to dir under ~"})
 
--- Keymap to set cwd to current mini.files column
+-- On MiniFiles creation
 vim.api.nvim_create_autocmd("User", {
   pattern = "MiniFilesBufferCreate",
   callback = function(args)
-    local buf_id = args.data.buf_id
+
+    -- Keymap to open grug-far with current mini.files column
+    map("n", "gs", function()
+      local state = require("mini.files").get_explorer_state()
+      if not state or not state.branch or not state.depth_focus then return end
+      local path = state.branch[state.depth_focus]
+      if not path then return end
+      local prefills = { paths = path }
+      local grug_far = require "grug-far"
+      -- instance check
+      if not grug_far.has_instance "explorer" then
+        grug_far.open {
+          instanceName = "explorer",
+          prefills = prefills,
+          staticTitle = "Find and Replace from Explorer",
+        }
+      else
+        grug_far.get_instance('explorer'):open()
+        -- updating the prefills without crealing the search and other fields
+        grug_far.get_instance('explorer'):update_input_values(prefills, false)
+      end
+    end, { buffer = args.data.buf_id, desc = "Search in directory" })
+
+    -- Keymap to set cwd to current mini.files column
     map("n", ".", function()
       local state = require("mini.files").get_explorer_state()
       if not state or not state.branch or not state.depth_focus then return end
@@ -274,7 +297,25 @@ vim.api.nvim_create_autocmd("User", {
       if not path then return end
       vim.fn.chdir(path)
       print("CWD changed to: " .. path)
-    end, { buffer = buf_id, desc = "Set CWD to current column directory" })
+    end, { buffer = args.data.buf_id, desc = "Set CWD to current column directory" })
+  end,
+})
+
+-- Open Grug-Far, smart visual selection behavior
+map({ 'n', 'x' }, '<leader>si', function()
+  require('grug-far').open({ visualSelectionUsage = 'auto-detect' })
+end, { desc = 'grug-far: Search within range' })
+
+-- TODO -- doesn't work
+-- Create a buffer local keybinding to open a result location and immediately close grug-far.nvim
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('grug-far-keybindings', { clear = true }),
+  pattern = { 'grug-far' },
+  callback = function()
+    vim.keymap.set('n', '<C-enter>', function()
+      require('grug-far').get_instance(0):open_location()
+      require('grug-far').get_instance(0):close()
+    end, { buffer = true })
   end,
 })
 
