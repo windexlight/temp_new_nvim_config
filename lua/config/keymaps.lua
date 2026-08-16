@@ -243,9 +243,6 @@ map({ "n", "x", "o" }, "[]", function() require("nvim-treesitter-textobjects.mov
 
 map("n", "<leader>fm", function() MiniFiles.open() end, { desc = "Lazygit (Root Dir)" })
 
--- TODO
--- Set up a keymap to send current contents of mini.files column to fzf-lua
-
 -- Fuzzy cd
 map({"i","n","v"}, "<M-f>d", function()
   require("fzf-lua").fzf_exec("fd . --type d", { --or fd
