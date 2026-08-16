@@ -284,7 +284,7 @@ vim.api.nvim_create_autocmd("User", {
         }
       else
         grug_far.get_instance('explorer'):open()
-        -- updating the prefills without crealing the search and other fields
+        -- updating the prefills without creating the search and other fields
         grug_far.get_instance('explorer'):update_input_values(prefills, false)
       end
     end, { buffer = args.data.buf_id, desc = "Search in directory" })
