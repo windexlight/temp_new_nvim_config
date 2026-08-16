@@ -95,16 +95,17 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Turn on relative line numbers in mini.files
-vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
-  pattern = "*",
-  callback = function()
-    if vim.bo.filetype == "minifiles" then --  or vim.bo.filetype == "trouble"
-      vim.opt_local.number = false
-      vim.opt_local.relativenumber = true
-      vim.opt_local.numberwidth = 4
-      vim.opt_local.signcolumn = "yes"
-    end
-  end,
+-- Relative line numbers in mini.files
+vim.api.nvim_create_autocmd("User", {
+    pattern = { "MiniFilesWindowOpen", "MiniFilesWindowUpdate" },
+    callback = function(args)
+        local win_id = args.data.win_id
+        if vim.api.nvim_win_is_valid(win_id) then
+          vim.wo[win_id].number = false
+          vim.wo[win_id].relativenumber = true
+          vim.wo[win_id].numberwidth = 4
+          vim.wo[win_id].signcolumn = "yes"
+        end
+    end,
 })
 
