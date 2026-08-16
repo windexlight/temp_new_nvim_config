@@ -64,7 +64,11 @@ require('fzf-lua').setup {
 require('mini.completion').setup {}
 require('quicker').setup {}
 require('gitsigns').setup {}
-require('mini.files').setup {}
+require('mini.files').setup {
+  mappings = {
+    reset = '_',
+  }
+}
 require('grug-far').setup {}
 
 require('config.options')
