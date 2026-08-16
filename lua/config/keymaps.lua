@@ -305,14 +305,14 @@ end, { desc = 'grug-far: Search within range' })
 
 -- TODO -- doesn't work
 -- Create a buffer local keybinding to open a result location and immediately close grug-far.nvim
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('grug-far-keybindings', { clear = true }),
-  pattern = { 'grug-far' },
-  callback = function()
-    vim.keymap.set('n', '<C-enter>', function()
-      require('grug-far').get_instance(0):open_location()
-      require('grug-far').get_instance(0):close()
-    end, { buffer = true })
-  end,
-})
+-- vim.api.nvim_create_autocmd('FileType', {
+--   group = vim.api.nvim_create_augroup('grug-far-keybindings', { clear = true }),
+--   pattern = { 'grug-far' },
+--   callback = function()
+--     vim.keymap.set('n', '<C-enter>', function()
+--       require('grug-far').get_instance(0):open_location()
+--       require('grug-far').get_instance(0):close()
+--     end, { buffer = true })
+--   end,
+-- })
 
