@@ -109,3 +109,13 @@ vim.api.nvim_create_autocmd("User", {
     end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "grug-far",
+  callback = function()
+    vim.opt_local.number = true
+    vim.opt_local.relativenumber = true
+    vim.opt_local.numberwidth = 4
+    vim.opt_local.signcolumn = "yes"
+  end,
+})
+
