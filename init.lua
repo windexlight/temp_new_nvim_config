@@ -40,6 +40,7 @@ vim.pack.add({
 
 require('fzf-lua').setup {
   fzf_colors = true,
+  defaults = { file_icons = false, git_icons = false },
   -- files = { file_icons = false, git_icons = false },
   -- oldfiles = { file_icons = false, git_icons = false },
   winopts = {
