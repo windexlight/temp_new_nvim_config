@@ -24,19 +24,11 @@ vim.api.nvim_create_autocmd("ModeChanged", {
     if mode == 't' then -- Watch for other corner cases where SafeState isn't triggered
       commit_mode()
     end
+    vim.defer_fn(function()
+      if pending then commit_mode() end
+    end, 15)
   end,
 })
-
--- Keep this in mind if for some reason some future plugin causes SafeState to never fire
--- vim.api.nvim_create_autocmd("ModeChanged", {
---   pattern = "*",
---   callback = function()
---     pending = true
---     vim.defer_fn(function()
---       if pending then commit_mode() end
---     end, 15) -- effectively never fires in normal grug-far usage; just a backstop
---   end,
--- })
 
 -- This works around an issue with spurious mode changes in some cases (grug-far insert mode, as one example)
 vim.api.nvim_create_autocmd("SafeState", {
