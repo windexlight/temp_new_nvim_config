@@ -48,7 +48,7 @@ require('fzf-lua').setup {
   -- files = { file_icons = false, git_icons = false },
   -- oldfiles = { file_icons = false, git_icons = false },
   winopts = {
-    split = "belowright new",
+    split = "botright new",
     preview = {
       layout = "flex",
       vertical = "down:50%",
