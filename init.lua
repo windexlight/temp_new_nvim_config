@@ -83,6 +83,20 @@ require('neogit').setup {
   },
 }
 
+require("diffview").setup({
+  keymaps = {
+    view = {
+      { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" } },
+    },
+    file_panel = {
+      { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" } },
+    },
+    file_history_panel = {
+      { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" } },
+    },
+  },
+})
+
 require('config.options')
 require('config.diagnostics')
 require('config.treesitter')
