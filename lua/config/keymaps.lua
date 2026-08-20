@@ -346,3 +346,5 @@ vim.keymap.set("n", "gS", function()
     end)
 end, { desc = "Neogit: browse all submodules" })
 
+-- TODO - gitsigns keymaps
+
