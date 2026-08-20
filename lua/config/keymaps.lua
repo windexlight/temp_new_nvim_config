@@ -319,3 +319,30 @@ end, { desc = 'grug-far: Search within range' })
 -- Open Neogit
 vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Open Neogit UI" })
 
+-- Open submodule in neogit
+-- TODO - Consider making that a buffer local map in neogit
+vim.keymap.set("n", "gS", function()
+  local status = require("neogit.buffers.status")
+  local Finder = require("neogit.lib.finder")
+
+  local instance = status.instance()
+  if not instance then
+    return
+  end
+
+  local submodules = instance:submodules()
+  if #submodules == 0 then
+    vim.notify("No submodules found", vim.log.levels.INFO)
+    return
+  end
+
+  Finder.create({ prompt_prefix = "submodule" })
+    :add_entries(submodules)
+    :find(function(choice)
+      if choice then
+        instance:close()
+        require("neogit").open { cwd = vim.fs.joinpath(instance.root, choice) }
+      end
+    end)
+end, { desc = "Neogit: browse all submodules" })
+
