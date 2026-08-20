@@ -77,10 +77,6 @@ require('grug-far').setup {}
 require('neogit').setup {
   disable_line_numbers = false,
   disable_relative_line_numbers = false,
-  -- Disable fzf-lua integration temporarily - watch https://github.com/NeogitOrg/neogit/pull/2001
-  integrations = {
-    fzf_lua = false,
-  },
 }
 
 require("diffview").setup({
