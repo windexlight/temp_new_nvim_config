@@ -67,7 +67,6 @@ require('fzf-lua').setup {
 }
 require('mini.completion').setup {}
 require('quicker').setup {}
-require('gitsigns').setup {}
 require('mini.files').setup {
   mappings = {
     reset = '_',
@@ -98,9 +97,13 @@ require('config.diagnostics')
 require('config.treesitter')
 require('config.lsp')
 require('config.qmk')
-require('config.keymaps')
+local keymaps = require('config.keymaps')
 require('config.autocmds')
 require('config.usercmds')
+
+require('gitsigns').setup {
+  on_attach = keymaps.gitsigns_on_attach
+}
 
 vim.g.gruvbox_material_enable_italic = true
 vim.g.gruvbox_material_background = 'medium'

@@ -317,11 +317,11 @@ end, { desc = 'grug-far: Search within range' })
 -- })
 
 -- Open Neogit
-vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Open Neogit UI" })
+map("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Open Neogit UI" })
 
 -- Open submodule in neogit
 -- TODO - Consider making that a buffer local map in neogit
-vim.keymap.set("n", "gS", function()
+map("n", "gS", function()
   local status = require("neogit.buffers.status")
   local Finder = require("neogit.lib.finder")
 
@@ -346,5 +346,73 @@ vim.keymap.set("n", "gS", function()
     end)
 end, { desc = "Neogit: browse all submodules" })
 
--- TODO - gitsigns keymaps
+local M = {}
+
+-- Gitsigns keymaps
+function M.gitsigns_on_attach(bufnr)
+  local gitsigns = require('gitsigns')
+
+  local function lmap(mode, l, r, opts)
+    opts = opts or {}
+    opts.buffer = bufnr
+    vim.keymap.set(mode, l, r, opts)
+  end
+
+  -- Navigation
+  lmap('n', ']c', function()
+    if vim.wo.diff then
+      vim.cmd.normal({']c', bang = true})
+    else
+      gitsigns.nav_hunk('next')
+    end
+  end)
+
+  lmap('n', '[c', function()
+    if vim.wo.diff then
+      vim.cmd.normal({'[c', bang = true})
+    else
+      gitsigns.nav_hunk('prev')
+    end
+  end)
+
+  -- Actions
+  lmap('n', '<leader>hs', gitsigns.stage_hunk)
+  lmap('n', '<leader>hr', gitsigns.reset_hunk)
+
+  lmap('v', '<leader>hs', function()
+    gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+  end)
+
+  lmap('v', '<leader>hr', function()
+    gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+  end)
+
+  lmap('n', '<leader>hS', gitsigns.stage_buffer)
+  lmap('n', '<leader>hR', gitsigns.reset_buffer)
+  lmap('n', '<leader>hp', gitsigns.preview_hunk)
+  lmap('n', '<leader>hi', gitsigns.preview_hunk_inline)
+
+  lmap('n', '<leader>hb', function()
+    gitsigns.blame_line({ full = true })
+  end)
+
+  -- Look into whether this has use in context of diffview. Standard diff mode is annoying.
+  -- lmap('n', '<leader>hd', gitsigns.diffthis)
+
+  lmap('n', '<leader>hD', function()
+    gitsigns.diffthis('~')
+  end)
+
+  lmap('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
+  lmap('n', '<leader>hq', gitsigns.setqflist)
+
+  -- Toggles
+  lmap('n', '<leader>tb', gitsigns.toggle_current_line_blame)
+  lmap('n', '<leader>tw', gitsigns.toggle_word_diff)
+
+  -- Text object
+  lmap({'o', 'x'}, 'ih', gitsigns.select_hunk)
+end
+
+return M
 
