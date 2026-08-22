@@ -34,6 +34,8 @@ vim.pack.add({
   -- Treesitter
   'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  -- Mini.ai
+  'https://github.com/nvim-mini/mini.ai',
   -- Grug-Far
   'https://github.com/MagicDuck/grug-far.nvim',
   -- Diff view
@@ -72,6 +74,74 @@ require('mini.files').setup {
     reset = '_',
   }
 }
+
+local spec_treesitter = require('mini.ai').gen_spec.treesitter
+require('mini.ai').setup {
+  n_lines = 500,
+  custom_textobjects = {
+    a = spec_treesitter { a = '@parameter.outer', i = '@parameter.inner' },
+    c = spec_treesitter { a = '@class.outer', i = '@class.inner' },
+    f = spec_treesitter { a = '@function.outer', i = '@function.inner' },
+    F = spec_treesitter { a = '@call.outer', i = '@call.inner' },
+    o = spec_treesitter {
+      a = { '@block.outer', '@conditional.outer', '@loop.outer' },
+      i = { '@block.inner', '@conditional.inner', '@loop.inner' },
+    },
+  },
+  -- Defaults:
+  -- mappings = {
+  --   -- Main textobject prefixes
+  --   around = 'a',
+  --   inside = 'i',
+  --
+  --   -- Next/last textobjects
+  --   -- NOTE: This (deliberately) overrides Neovim>=0.12 built-in incremental
+  --   -- selection mappings. See `:h MiniAi-default-an-in` for more details.
+  --   around_next = 'an',
+  --   inside_next = 'in',
+  --   around_last = 'al',
+  --   inside_last = 'il',
+  --
+  --   -- Move cursor to corresponding edge of `a` textobject
+  --   goto_left = 'g[',
+  --   goto_right = 'g]',
+  -- },
+  -- ┌───┬───────────────┬──────────────────┬────────┬────────┬────────┬────────┐
+  -- │Key│     Name      │   Example line   │   a    │   i    │   2a   │   2i   │
+  -- ├───┴───────────────┴──────────────────┴────────┴────────┴────────┴────────┤
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ ( │  Balanced ()  │ (( *a (bb) ))    │        │        │        │        │
+  -- │ [ │  Balanced []  │ [[ *a [bb] ]]    │ [2;12] │ [4;10] │ [1;13] │ [2;12] │
+  -- │ { │  Balanced {}  │ {{ *a {bb} }}    │        │        │        │        │
+  -- │ < │  Balanced <>  │ << *a <bb> >>    │        │        │        │        │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ ) │  Balanced ()  │ (( *a (bb) ))    │        │        │        │        │
+  -- │ ] │  Balanced []  │ [[ *a [bb] ]]    │        │        │        │        │
+  -- │ } │  Balanced {}  │ {{ *a {bb} }}    │ [2;12] │ [3;11] │ [1;13] │ [2;12] │
+  -- │ > │  Balanced <>  │ << *a <bb> >>    │        │        │        │        │
+  -- │ b │  Alias for    │ [( *a {bb} )]    │        │        │        │        │
+  -- │   │  ), ], or }   │                  │        │        │        │        │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ " │  Balanced "   │ "*a" " bb "      │        │        │        │        │
+  -- │ ' │  Balanced '   │ '*a' ' bb '      │        │        │        │        │
+  -- │ ` │  Balanced `   │ `*a` ` bb `      │ [1;4]  │ [2;3]  │ [6;11] │ [7;10] │
+  -- │ q │  Alias for    │ '*a' " bb "      │        │        │        │        │
+  -- │   │  ", ', or `   │                  │        │        │        │        │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ ? │  User prompt  │ e*e o e o o      │ [3;5]  │ [4;4]  │ [7;9]  │ [8;8]  │
+  -- │   │(typed e and o)│                  │        │        │        │        │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ t │      Tag      │ <x><y>*a</y></x> │ [4;12] │ [7;8]  │ [1;16] │ [4;12] │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ f │ Function call │ f(a, g(*b, c) )  │ [6;13] │ [8;12] │ [1;15] │ [3;14] │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │ a │   Argument    │ f(*a, g(b, c) )  │ [3;5]  │ [3;4]  │ [5;14] │ [7;13] │
+  -- ├┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈1234567890123456┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┤
+  -- │   │    Default    │ aa_*b__cc___     │ [4;7]  │ [4;5]  │ [8;12] │ [8;9]  │
+  -- │   │   (typed _)   │                  │        │        │        │        │
+  -- └───┴───────────────┴──────────────────┴────────┴────────┴────────┴────────┘
+}
+
 require('grug-far').setup {}
 require('neogit').setup {
   disable_line_numbers = false,
