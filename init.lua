@@ -39,7 +39,7 @@ vim.pack.add({
   -- Grug-Far
   'https://github.com/MagicDuck/grug-far.nvim',
   -- Diff view
-  'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/dlyongemallo/diffview-plus.nvim',
   -- Neogit
   'https://github.com/neogitorg/neogit',
 })
