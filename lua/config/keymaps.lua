@@ -414,5 +414,18 @@ function M.gitsigns_on_attach(bufnr)
   lmap({'o', 'x'}, 'ih', gitsigns.select_hunk)
 end
 
+-- Mini.ai better text object motions
+-- local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
+local function get_ai_type()
+  local ok, char = pcall(vim.fn.getcharstr)
+  if not ok or char == '' or char == '\3' or char == '\27' then return nil end
+  return char
+end
+-- TODO - somehow use repeatable_move to make these repeatable with , ;
+map({'n', 'o', 'x'}, 'gl', function () _G.MiniAi.move_cursor('left', 'a', get_ai_type(), { search_method = 'next' }) end)
+map({'n', 'o', 'x'}, 'gh', function () _G.MiniAi.move_cursor('left', 'a', get_ai_type(), { search_method = 'cover_or_prev' }) end)
+map({'n', 'o', 'x'}, 'gj', function () _G.MiniAi.move_cursor('right', 'a', get_ai_type(), { search_method = 'cover_or_next' }) end)
+map({'n', 'o', 'x'}, 'gk', function () _G.MiniAi.move_cursor('right', 'a', get_ai_type(), { search_method = 'prev' }) end)
+
 return M
 
