@@ -415,17 +415,36 @@ function M.gitsigns_on_attach(bufnr)
 end
 
 -- Mini.ai better text object motions
--- local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
+local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 local function get_ai_type()
   local ok, char = pcall(vim.fn.getcharstr)
   if not ok or char == '' or char == '\3' or char == '\27' then return nil end
   return char
 end
--- TODO - somehow use repeatable_move to make these repeatable with , ;
-map({'n', 'o', 'x'}, 'gl', function () _G.MiniAi.move_cursor('left', 'a', get_ai_type(), { search_method = 'next' }) end)
-map({'n', 'o', 'x'}, 'gh', function () _G.MiniAi.move_cursor('left', 'a', get_ai_type(), { search_method = 'cover_or_prev' }) end)
-map({'n', 'o', 'x'}, 'gj', function () _G.MiniAi.move_cursor('right', 'a', get_ai_type(), { search_method = 'cover_or_next' }) end)
-map({'n', 'o', 'x'}, 'gk', function () _G.MiniAi.move_cursor('right', 'a', get_ai_type(), { search_method = 'prev' }) end)
+
+local function mini_ai_move_cursor(side, search_method)
+  local ai_type = get_ai_type()
+  local forward, back = 'next', 'prev'
+  local next = string.find(search_method, 'next', 1, true)
+  local opp = next and back or forward
+  if not string.find(search_method, 'cover', 1, true) then
+    opp = 'cover_or_' .. opp
+  end
+  if next then
+    forward, back = search_method, opp
+  else
+    forward, back = opp, search_method
+  end
+  local move = ts_repeat_move.make_repeatable_move(function(opts)
+    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and forward or back })
+  end)
+  move({ forward = next })
+end
+
+map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', 'next') end)
+map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', 'cover_or_prev') end)
+map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', 'cover_or_next') end)
+map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', 'prev') end)
 
 return M
 
