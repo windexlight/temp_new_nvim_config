@@ -192,3 +192,8 @@ if vim.g.neovide then
   -- vim.g.neovide_scroll_animation_length = 0.00
 end
 
+-- Stop annoying grey underlines everywhere when any tiny thing is wrong
+vim.diagnostic.config({
+  underline = false,
+})
+
