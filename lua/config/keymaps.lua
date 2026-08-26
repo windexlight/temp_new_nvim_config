@@ -422,6 +422,8 @@ local function get_ai_type()
   return char
 end
 
+-- TODO - Somehow support both parent and sibling navigation.
+-- TODO - Builtin expr_motion in mini.ai clears its internal cache, which I can't do here. Side effects?
 local function mini_ai_move_cursor(side, search_method)
   local ai_type = get_ai_type()
   if ai_type == nil then return end
@@ -437,7 +439,7 @@ local function mini_ai_move_cursor(side, search_method)
     forward, back = opp, search_method
   end
   local move = ts_repeat_move.make_repeatable_move(function(opts)
-    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and forward or back })
+    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and forward or back, n_times = vim.v.count1 })
   end)
   move({ forward = next })
 end
