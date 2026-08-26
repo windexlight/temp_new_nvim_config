@@ -424,6 +424,7 @@ end
 
 local function mini_ai_move_cursor(side, search_method)
   local ai_type = get_ai_type()
+  if ai_type == nil then return end
   local forward, back = 'next', 'prev'
   local next = string.find(search_method, 'next', 1, true)
   local opp = next and back or forward
