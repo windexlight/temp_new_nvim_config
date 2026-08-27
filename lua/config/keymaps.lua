@@ -445,7 +445,7 @@ local function mini_ai_move_cursor(side, search_method)
 end
 
 map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', 'next') end)
-map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', 'cover_or_prev') end)
+map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', 'prev_or_cover') end)
 map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', 'cover_or_next') end)
 map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', 'prev') end)
 
