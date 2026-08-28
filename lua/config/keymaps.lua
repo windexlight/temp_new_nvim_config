@@ -424,30 +424,19 @@ end
 
 -- TODO - Somehow support both parent and sibling navigation.
 -- TODO - Builtin expr_motion in mini.ai clears its internal cache, which I can't do here. Side effects?
-local function mini_ai_move_cursor(side, search_method)
+local function mini_ai_move_cursor(side, dir)
   local ai_type = get_ai_type()
   if ai_type == nil then return end
-  local forward, back = 'next', 'prev'
-  local next = string.find(search_method, 'next', 1, true)
-  local opp = next and back or forward
-  if not string.find(search_method, 'cover', 1, true) then
-    opp = 'cover_or_' .. opp
-  end
-  if next then
-    forward, back = search_method, opp
-  else
-    forward, back = opp, search_method
-  end
   local move = ts_repeat_move.make_repeatable_move(function(opts)
-    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and forward or back, n_times = vim.v.count1 })
+    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and dir.next or dir.prev, n_times = vim.v.count1 })
   end)
-  move({ forward = next })
+  move({ forward = dir.forward })
 end
 
-map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', 'next') end)
-map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', 'prev_or_cover') end)
-map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', 'cover_or_next') end)
-map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', 'prev') end)
+map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'prev_or_cover' }) end)
+map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'prev_or_cover' }) end)
+map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', { forward = true, next = 'cover_or_next', prev = 'prev' }) end)
+map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', { forward = false, next = 'cover_or_next', prev = 'prev' }) end)
 
 return M
 
