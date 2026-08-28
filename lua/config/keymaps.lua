@@ -435,6 +435,8 @@ end
 
 map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'prev_or_cover' }) end)
+map({'n', 'o', 'x'}, 'gL', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'cover_or_prev' }) end)
+map({'n', 'o', 'x'}, 'gH', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'cover_or_prev' }) end)
 map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', { forward = true, next = 'cover_or_next', prev = 'prev' }) end)
 map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', { forward = false, next = 'cover_or_next', prev = 'prev' }) end)
 
