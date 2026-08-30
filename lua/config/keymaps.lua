@@ -425,22 +425,37 @@ end
 -- TODO - Somehow support both parent and sibling navigation.
 -- TODO - Builtin expr_motion in mini.ai clears its internal cache, which I can't do here. Side effects?
 local function mini_ai_move_cursor(side, dir)
+  local sibling = false
+  if dir.next == 'next_sibling' then
+    sibling = true
+    dir.next = 'next'
+  end
+  if dir.prev == 'prev_sibling' then
+    sibling = true
+    dir.prev = 'prev'
+  end
   local ai_type = get_ai_type()
   if ai_type == nil then return end
   local move = ts_repeat_move.make_repeatable_move(function(opts)
-    _G.MiniAi.move_cursor(side, 'a', ai_type, { search_method = opts.forward and dir.next or dir.prev, n_times = vim.v.count1 })
+    local new_opts = { search_method = opts.forward and dir.next or dir.prev, n_times = vim.v.count1 }
+    if sibling then
+      local cover_opts = vim.deepcopy(new_opts)
+      cover_opts.search_method = 'cover'
+      new_opts.reference_region = _G.MiniAi.find_textobject('a', ai_type, cover_opts)
+    end
+    _G.MiniAi.move_cursor(side, 'a', ai_type, new_opts)
   end)
   move({ forward = dir.forward })
 end
 
 map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'prev_or_cover' }) end)
-map({'n', 'o', 'x'}, 'gL', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'cover_or_prev' }) end)
-map({'n', 'o', 'x'}, 'gH', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'cover_or_prev' }) end)
+map({'n', 'o', 'x'}, 'gL', function () mini_ai_move_cursor('left', { forward = true, next = 'next_sibling', prev = 'cover_or_prev' }) end)
+map({'n', 'o', 'x'}, 'gH', function () mini_ai_move_cursor('left', { forward = false, next = 'next_sibling', prev = 'cover_or_prev' }) end)
 map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', { forward = true, next = 'next_or_cover', prev = 'prev' }) end)
 map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', { forward = false, next = 'next_or_cover', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'gJ', function () mini_ai_move_cursor('right', { forward = true, next = 'cover_or_next', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'gK', function () mini_ai_move_cursor('right', { forward = false, next = 'cover_or_next', prev = 'prev' }) end)
+map({'n', 'o', 'x'}, 'gJ', function () mini_ai_move_cursor('right', { forward = true, next = 'cover_or_next', prev = 'prev_sibling' }) end)
+map({'n', 'o', 'x'}, 'gK', function () mini_ai_move_cursor('right', { forward = false, next = 'cover_or_next', prev = 'prev_sibling' }) end)
 
 return M
 
