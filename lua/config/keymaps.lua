@@ -42,6 +42,12 @@ for _, move in ipairs(moves) do
   end, { expr = true, silent = true })
 end
 
+-- Clear multicursors
+map({'n'}, '<leader>Q', function ()
+  local mc_ns = vim.api.nvim_create_namespace('nvim.multicursor')
+  vim.api.nvim_buf_clear_namespace(0, mc_ns, 0, -1)
+end)
+
 -- Move to window using the <ctrl> hjkl keys
 map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
 map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
