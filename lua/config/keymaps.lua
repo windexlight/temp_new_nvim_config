@@ -420,19 +420,20 @@ function M.gitsigns_on_attach(bufnr)
   lmap({'o', 'x'}, 'ih', gitsigns.select_hunk)
 end
 
--- Mini.ai better text object motions
+-- Setup for mini.ai better text object motions
+-- Note: does not work with multicursors for now, as vim.api.nvim_win_set_cursor only seems to affect
+-- the regular cursor. Not sure if that will change at any point in the future.
+-- TODO - Builtin expr_motion in mini.ai clears its internal cache, which I can't do here. Side effects?
+local inside = false
 local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
 local function get_tobj_id()
   local ok, char = pcall(vim.fn.getcharstr)
   if not ok or char == '' or char == '\3' or char == '\27' then return nil end
   return char
 end
-
--- Note: does not work with multicursors for now, as vim.api.nvim_win_set_cursor only seems to affect
--- the regular cursor. Not sure if that will change at any point in the future.
--- TODO - Builtin expr_motion in mini.ai clears its internal cache, which I can't do here. Side effects?
 local function mini_ai_move_cursor(side, params)
   local sibling = false
+  inside = false
   if params.next == 'next_sibling' then
     sibling = true
     params.next = 'next'
@@ -458,11 +459,11 @@ local function mini_ai_move_cursor(side, params)
       vim.cmd("normal! `<")
     end
     -- Always move cursor first, than select what we moved to if needed
-    _G.MiniAi.move_cursor(side, 'a', tobj_id, new_opts)
+    _G.MiniAi.move_cursor(side, opts.ai_type or 'a', tobj_id, new_opts)
     if params.select then
       new_opts.search_method = 'cover'
       new_opts.reference_region = nil
-      _G.MiniAi.select_textobject('a', tobj_id, new_opts)
+      _G.MiniAi.select_textobject(opts.ai_type or 'a', tobj_id, new_opts)
       if vim.fn.mode():match("^[vV\27]") ~= nil then
         vim.cmd("normal! o") -- End with cursor at beginning of selection because it feels more natural
       end
@@ -471,6 +472,7 @@ local function mini_ai_move_cursor(side, params)
   move({ forward = params.forward })
 end
 
+-- Keymaps for mini.ai better text object motions
 map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', { forward = true, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'gL', function () mini_ai_move_cursor('left', { forward = true, next = 'next_sibling', prev = 'cover_or_prev' }) end)
@@ -488,6 +490,22 @@ map({'n', 'o', 'x'}, 'sj', function () mini_ai_move_cursor('right', { select = t
 map({'n', 'o', 'x'}, 'sk', function () mini_ai_move_cursor('right', { select = true, forward = false, next = 'next_or_cover', prev = 'prev' }) end)
 map({'n', 'o', 'x'}, 'sJ', function () mini_ai_move_cursor('right', { select = true, forward = true, next = 'cover_or_next', prev = 'prev_sibling' }) end)
 map({'n', 'o', 'x'}, 'sK', function () mini_ai_move_cursor('right', { select = true, forward = false, next = 'cover_or_next', prev = 'prev_sibling' }) end)
+
+-- Repeat movement with ; and ,
+-- ensure ; goes forward and , goes backward regardless of the last direction
+map({ "n", "x", "o" }, ";", function () ts_repeat_move.repeat_last_move({ forward = true, ai_type = inside and 'i' }) end)
+map({ "n", "x", "o" }, ",", function () ts_repeat_move.repeat_last_move({ forward = false, ai_type = inside and 'i' }) end)
+
+-- Go inside/outside last mini.ai object, or if last repeatable move was not mini.ai, just repeat normally
+map({ "n", "x", "o" }, "g]", function () inside = true; ts_repeat_move.repeat_last_move({ forward = true, ai_type = 'i' }) end)
+map({ "n", "x", "o" }, "g[", function () inside = false; ts_repeat_move.repeat_last_move({ forward = false, ai_type = 'a' }) end)
+
+-- Make builtin f, F, t, T also repeatable with ; and ,
+map({ "n", "x", "o" }, "f", function() return require("config.qmk").f_wrapper(ts_repeat_move.builtin_f_expr) end, { expr = true })
+map({ "n", "x", "o" }, "F", function() return require("config.qmk").f_wrapper(ts_repeat_move.builtin_F_expr) end, { expr = true })
+map({ "n", "x", "o" }, "t", function() return require("config.qmk").f_wrapper(ts_repeat_move.builtin_t_expr) end, { expr = true })
+map({ "n", "x", "o" }, "T", function() return require("config.qmk").f_wrapper(ts_repeat_move.builtin_T_expr) end, { expr = true })
+map({ "n", "x", "o" }, "r", require("config.qmk").r_wrapper, { expr = true })
 
 return M
 

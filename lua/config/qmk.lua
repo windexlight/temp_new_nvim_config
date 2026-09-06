@@ -65,31 +65,16 @@ vim.on_key(function(key)
   end
 end, ns)
 
-local ts_repeat_move = require "nvim-treesitter-textobjects.repeatable_move"
+M = {
+  f_wrapper = function (call_me)
+    f_wrapper_armed = true
+    return call_me()
+  end,
 
--- Repeat movement with ; and ,
--- ensure ; goes forward and , goes backward regardless of the last direction
-map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move_next) -- TODO -- These don't seem to actually work if there is an f or t in history
-map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_previous)
+  r_wrapper = function ()
+    f_wrapper_armed = true
+    return "r"
+  end,
+}
 
--- vim way: ; goes to the direction you were moving.
--- map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
--- map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
-
-local function f_wrapper(call_me)
-  f_wrapper_armed = true
-  return call_me()
-end
-
-local function r_wrapper()
-  f_wrapper_armed = true
-  return "r"
-end
-
--- Make builtin f, F, t, T also repeatable with ; and ,
-map({ "n", "x", "o" }, "f", function() return f_wrapper(ts_repeat_move.builtin_f_expr) end, { expr = true })
-map({ "n", "x", "o" }, "F", function() return f_wrapper(ts_repeat_move.builtin_F_expr) end, { expr = true })
-map({ "n", "x", "o" }, "t", function() return f_wrapper(ts_repeat_move.builtin_t_expr) end, { expr = true })
-map({ "n", "x", "o" }, "T", function() return f_wrapper(ts_repeat_move.builtin_T_expr) end, { expr = true })
-map({ "n", "x", "o" }, "r", r_wrapper, { expr = true })
-
+return M

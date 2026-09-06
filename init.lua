@@ -167,12 +167,12 @@ require('config.diagnostics')
 require('config.treesitter')
 require('config.lsp')
 require('config.qmk')
-local keymaps = require('config.keymaps')
+require('config.keymaps')
 require('config.autocmds')
 require('config.usercmds')
 
 require('gitsigns').setup {
-  on_attach = keymaps.gitsigns_on_attach
+  on_attach = require('config.keymaps').gitsigns_on_attach
 }
 
 vim.g.gruvbox_material_enable_italic = true
