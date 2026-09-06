@@ -422,7 +422,7 @@ end
 
 -- Mini.ai better text object motions
 local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
-local function get_ai_type()
+local function get_tobj_id()
   local ok, char = pcall(vim.fn.getcharstr)
   if not ok or char == '' or char == '\3' or char == '\27' then return nil end
   return char
@@ -441,15 +441,15 @@ local function mini_ai_move_cursor(side, params)
     sibling = true
     params.prev = 'prev'
   end
-  local ai_type = get_ai_type()
-  if ai_type == nil then return end
+  local tobj_id = get_tobj_id()
+  if tobj_id == nil then return end
   local move = ts_repeat_move.make_repeatable_move(function(opts)
     local new_opts = { search_method = opts.forward and params.next or params.prev, n_times = vim.v.count1 }
     -- Sibling navigation requires identifying span of what we're on first
     if sibling then
       local cover_opts = vim.deepcopy(new_opts)
       cover_opts.search_method = 'cover'
-      new_opts.reference_region = _G.MiniAi.find_textobject('a', ai_type, cover_opts)
+      new_opts.reference_region = _G.MiniAi.find_textobject('a', tobj_id, cover_opts)
     end
     -- If visual mode, go back to normal and jump to beginning of selection
     if vim.fn.mode():match("^[vV\27]") ~= nil then
@@ -458,11 +458,11 @@ local function mini_ai_move_cursor(side, params)
       vim.cmd("normal! `<")
     end
     -- Always move cursor first, than select what we moved to if needed
-    _G.MiniAi.move_cursor(side, 'a', ai_type, new_opts)
+    _G.MiniAi.move_cursor(side, 'a', tobj_id, new_opts)
     if params.select then
       new_opts.search_method = 'cover'
       new_opts.reference_region = nil
-      _G.MiniAi.select_textobject('a', ai_type, new_opts)
+      _G.MiniAi.select_textobject('a', tobj_id, new_opts)
       if vim.fn.mode():match("^[vV\27]") ~= nil then
         vim.cmd("normal! o") -- End with cursor at beginning of selection because it feels more natural
       end
