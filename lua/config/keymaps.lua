@@ -447,33 +447,29 @@ local function mini_ai_move_cursor(side, params)
   local move = ts_repeat_move.make_repeatable_move(function(opts)
     local new_opts = { search_method = opts.forward and params.next or params.prev }
     for _ = 1, vim.v.count1 do
-      vim.schedule(function()
-        -- Sibling navigation requires identifying span of what we're on first
-        if sibling then
-          local cover_opts = vim.deepcopy(new_opts)
-          cover_opts.search_method = 'cover'
-          new_opts.reference_region = _G.MiniAi.find_textobject('a', tobj_id, cover_opts)
-        end
-        -- If visual mode, go back to normal and jump to beginning of selection
-        if vim.fn.mode():match("^[vV\27]") ~= nil then
-          local esc = vim.api.nvim_replace_termcodes('<esc>', true, false, true)
-          vim.api.nvim_feedkeys(esc, 'x', false)
-          vim.cmd("normal! `<")
-        end
-        -- Always move cursor first, than select what we moved to if needed
-        _G.MiniAi.move_cursor(side, opts.ai_type or 'a', tobj_id, new_opts)
-      end)
-    end
-    vim.schedule(function()
-      if params.select then
-        new_opts.search_method = 'cover'
-        new_opts.reference_region = nil
-        _G.MiniAi.select_textobject(opts.ai_type or 'a', tobj_id, new_opts)
-        if vim.fn.mode():match("^[vV\27]") ~= nil then
-          vim.cmd("normal! o") -- End with cursor at beginning of selection because it feels more natural
-        end
+      -- Sibling navigation requires identifying span of what we're on first
+      if sibling then
+        local cover_opts = vim.deepcopy(new_opts)
+        cover_opts.search_method = 'cover'
+        new_opts.reference_region = _G.MiniAi.find_textobject('a', tobj_id, cover_opts)
       end
-    end)
+      -- If visual mode, go back to normal and jump to beginning of selection
+      if vim.fn.mode():match("^[vV\27]") ~= nil then
+        local esc = vim.api.nvim_replace_termcodes('<esc>', true, false, true)
+        vim.api.nvim_feedkeys(esc, 'x', false)
+        vim.cmd("normal! `<")
+      end
+      -- Always move cursor first, than select what we moved to if needed
+      _G.MiniAi.move_cursor(side, opts.ai_type or params.ai_type or 'a', tobj_id, new_opts)
+    end
+    if params.select then
+      new_opts.search_method = 'cover'
+      new_opts.reference_region = nil
+      _G.MiniAi.select_textobject(opts.ai_type or params.ai_type or 'a', tobj_id, new_opts)
+      if vim.fn.mode():match("^[vV\27]") ~= nil then
+        vim.cmd("normal! o") -- End with cursor at beginning of selection because it feels more natural
+      end
+    end
   end)
   move({ forward = params.forward })
 end
@@ -483,19 +479,15 @@ map({'n', 'o', 'x'}, 'gl', function () mini_ai_move_cursor('left', { forward = t
 map({'n', 'o', 'x'}, 'gh', function () mini_ai_move_cursor('left', { forward = false, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'gL', function () mini_ai_move_cursor('left', { forward = true, next = 'next_sibling', prev = 'cover_or_prev' }) end)
 map({'n', 'o', 'x'}, 'gH', function () mini_ai_move_cursor('left', { forward = false, next = 'next_sibling', prev = 'cover_or_prev' }) end)
-map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', { forward = true, next = 'next_or_cover', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', { forward = false, next = 'next_or_cover', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'gJ', function () mini_ai_move_cursor('right', { forward = true, next = 'cover_or_next', prev = 'prev_sibling' }) end)
-map({'n', 'o', 'x'}, 'gK', function () mini_ai_move_cursor('right', { forward = false, next = 'cover_or_next', prev = 'prev_sibling' }) end)
+map({'n', 'o', 'x'}, 'gj', function () mini_ai_move_cursor('right', { forward = true, next = 'next_or_cover', prev = 'prev', ai_type = 'i' }) end)
+map({'n', 'o', 'x'}, 'gk', function () mini_ai_move_cursor('right', { forward = true, next = 'next_or_cover', prev = 'prev' }) end)
+map({'n', 'o', 'x'}, 'gJ', function () mini_ai_move_cursor('right', { forward = false, next = 'next_or_cover', prev = 'prev', ai_type = 'i' }) end)
+map({'n', 'o', 'x'}, 'gK', function () mini_ai_move_cursor('right', { forward = false, next = 'next_or_cover', prev = 'prev' }) end)
 
 map({'n', 'o', 'x'}, 'sl', function () mini_ai_move_cursor('left', { select = true, forward = true, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'sh', function () mini_ai_move_cursor('left', { select = true, forward = false, next = 'next', prev = 'prev_or_cover' }) end)
 map({'n', 'o', 'x'}, 'sL', function () mini_ai_move_cursor('left', { select = true, forward = true, next = 'next_sibling', prev = 'cover_or_prev' }) end)
 map({'n', 'o', 'x'}, 'sH', function () mini_ai_move_cursor('left', { select = true, forward = false, next = 'next_sibling', prev = 'cover_or_prev' }) end)
-map({'n', 'o', 'x'}, 'sj', function () mini_ai_move_cursor('right', { select = true, forward = true, next = 'next_or_cover', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'sk', function () mini_ai_move_cursor('right', { select = true, forward = false, next = 'next_or_cover', prev = 'prev' }) end)
-map({'n', 'o', 'x'}, 'sJ', function () mini_ai_move_cursor('right', { select = true, forward = true, next = 'cover_or_next', prev = 'prev_sibling' }) end)
-map({'n', 'o', 'x'}, 'sK', function () mini_ai_move_cursor('right', { select = true, forward = false, next = 'cover_or_next', prev = 'prev_sibling' }) end)
 
 -- Repeat movement with ; and ,
 -- ensure ; goes forward and , goes backward regardless of the last direction
