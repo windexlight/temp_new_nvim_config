@@ -165,6 +165,7 @@ map("n", "<leader>fb", function() FzfLua.buffers() end, { desc = "Goto Buffers" 
 map("n", "<leader>ff", function() FzfLua.files() end, { desc = "Goto Files" }) -- No native
 map("n", "<leader>ft", function() FzfLua.tabs() end, { desc = "Goto Tabs" }) -- No native
 map("n", "<leader>fl", function() FzfLua.lines() end, { desc = "Goto Lines" }) -- No native
+map("n", "<leader>fj", function() FzfLua.jumps() end, { desc = "FzfLua Jumps" }) -- No native
 map("n", "<leader>fr", function() FzfLua.resume() end, { desc = "FzfLua Resume" }) -- No native
 map("n", "gm", function() FzfLua.marks() end, { desc = "Goto Marks" }) -- No native
 
