@@ -21,21 +21,20 @@ vim.pack.add({
   -- Fuzzy picker
   'https://github.com/ibhagwan/fzf-lua',
   'https://github.com/kyazdani42/nvim-web-devicons',
-  -- Autocompletion
-  'https://github.com/nvim-mini/mini.completion',
   -- Enhanced quickfix/loclist
   'https://github.com/stevearc/quicker.nvim',
   -- Git integration
   'https://github.com/lewis6991/gitsigns.nvim',
-  -- File navigation
-  'https://github.com/nvim-mini/mini.files',
   -- Color scheme
   'https://github.com/sainnhe/gruvbox-material',
   -- Treesitter
   'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
-  -- Mini.ai
+  -- Mini.nvim
+  'https://github.com/nvim-mini/mini.completion',
+  'https://github.com/nvim-mini/mini.files',
   'https://github.com/nvim-mini/mini.ai',
+  'https://github.com/nvim-mini/mini.bufremove',
   -- Grug-Far
   'https://github.com/MagicDuck/grug-far.nvim',
   -- Diff view
@@ -74,7 +73,7 @@ require('mini.files').setup {
     reset = '_',
   }
 }
-
+require('mini.bufremove').setup {}
 local spec_treesitter = require('mini.ai').gen_spec.treesitter
 require('mini.ai').setup {
   n_lines = 500,
