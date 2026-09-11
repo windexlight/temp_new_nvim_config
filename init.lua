@@ -82,6 +82,9 @@ require('mini.ai').setup {
     c = spec_treesitter { a = '@class.outer', i = '@class.inner' },
     f = spec_treesitter { a = '@function.outer', i = '@function.inner' },
     F = spec_treesitter { a = '@call.outer', i = '@call.inner' },
+    s = spec_treesitter { a = '@statement.outer', i = '@statement.outer' },
+    m = spec_treesitter { a = '@comment.outer', i = '@comment.inner' },
+    n = spec_treesitter { a = '@number.inner', i = '@number.inner' },
     o = spec_treesitter {
       a = { '@block.outer', '@conditional.outer', '@loop.outer' },
       i = { '@block.inner', '@conditional.inner', '@loop.inner' },
