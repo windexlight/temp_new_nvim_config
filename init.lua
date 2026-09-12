@@ -193,6 +193,10 @@ end
 require("toggleterm").setup {
   open_mapping = "gt",
   hide_numbers = false,
+  on_open = function(term)
+    vim.wo[term.window].number = true
+    vim.wo[term.window].relativenumber = true
+  end,
 }
 
 require('config.options')
