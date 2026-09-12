@@ -30,6 +30,7 @@ vim.pack.add({
   -- Treesitter
   'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  'https://github.com/nvim-treesitter/nvim-treesitter-context',
   -- Mini.nvim
   'https://github.com/nvim-mini/mini.completion',
   'https://github.com/nvim-mini/mini.files',
@@ -38,12 +39,14 @@ vim.pack.add({
   'https://github.com/nvim-mini/mini.trailspace',
   -- 'https://github.com/nvim-mini/mini.cursorword',
   'https://github.com/nvim-mini/mini.map',
+  'https://github.com/nvim-mini/mini.indentscope',
   -- Grug-Far
   'https://github.com/MagicDuck/grug-far.nvim',
   -- Diff view
   'https://github.com/dlyongemallo/diffview-plus.nvim',
   -- Neogit
   'https://github.com/neogitorg/neogit',
+  'https://github.com/akinsho/toggleterm.nvim',
 })
 
 require('fzf-lua').setup {
@@ -79,6 +82,7 @@ require('mini.files').setup {
 require('mini.bufremove').setup {}
 require('mini.trailspace').setup {}
 -- require('mini.cursorword').setup {}
+require('mini.indentscope').setup {}
 local map = require('mini.map')
 map.setup({
   integrations = {
@@ -162,8 +166,7 @@ require('neogit').setup {
   disable_line_numbers = false,
   disable_relative_line_numbers = false,
 }
-
-require("diffview").setup({
+require("diffview").setup {
   keymaps = {
     view = {
       { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" } },
@@ -175,7 +178,22 @@ require("diffview").setup({
       { "n", "q", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" } },
     },
   },
-})
+}
+local powershell_options = {
+  shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell",
+  shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;",
+  shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait",
+  shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode",
+  shellquote = "",
+  shellxquote = "",
+}
+for option, value in pairs(powershell_options) do
+  vim.opt[option] = value
+end
+require("toggleterm").setup {
+  open_mapping = "gt",
+  hide_numbers = false,
+}
 
 require('config.options')
 require('config.diagnostics')
