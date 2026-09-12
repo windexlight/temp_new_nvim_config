@@ -248,6 +248,15 @@ map({ "n", "x", "o" }, "[M", function() require("nvim-treesitter-textobjects.mov
 -- end)
 --
 
+-- Mini.Map
+map('n', '<Leader>mc', MiniMap.close)
+map('n', '<Leader>mf', MiniMap.toggle_focus)
+map('n', '<Leader>mo', MiniMap.open)
+map('n', '<Leader>mr', MiniMap.refresh)
+map('n', '<Leader>ms', MiniMap.toggle_side)
+map('n', '<Leader>mt', MiniMap.toggle)
+
+-- Mini.Files
 map("n", "<leader>fm", function() MiniFiles.open() end, { desc = "Lazygit (Root Dir)" })
 
 -- Fuzzy cd
